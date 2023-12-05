@@ -1,6 +1,6 @@
 hostname: dc1-leaf2b
 router_bgp:
-  as: '65102'
+  as: '65101'
   router_id: 10.255.0.6
   bgp:
     default:
@@ -9,20 +9,6 @@ router_bgp:
     paths: 4
     ecmp: 4
   peer_groups:
-  - name: MLAG-IPv4-UNDERLAY-PEER
-    type: ipv4
-    remote_as: '65102'
-    next_hop_self: true
-    description: dc1-leaf2a
-    password: 4b21pAdCvWeAqpcKDFMdWw==
-    maximum_routes: 12000
-    send_community: all
-    route_map_in: RM-MLAG-PEER-IN
-  - name: IPv4-UNDERLAY-PEERS
-    type: ipv4
-    password: 7x4B4rnJhZB438m9+BrBfQ==
-    maximum_routes: 12000
-    send_community: all
   - name: EVPN-OVERLAY-PEERS
     type: evpn
     update_source: Loopback0
@@ -30,42 +16,28 @@ router_bgp:
     password: Q4fqtbqcZ7oQuKfuWtNGRQ==
     send_community: all
     maximum_routes: 0
-    ebgp_multihop: 3
+    remote_as: '65101'
+  - name: MLAG-IPv4-UNDERLAY-PEER
+    type: ipv4
+    remote_as: '65101'
+    next_hop_self: true
+    description: dc1-leaf2a
+    password: 4b21pAdCvWeAqpcKDFMdWw==
+    maximum_routes: 12000
+    send_community: all
+    route_map_in: RM-MLAG-PEER-IN
   address_family_ipv4:
     peer_groups:
-    - name: MLAG-IPv4-UNDERLAY-PEER
-      activate: true
-    - name: IPv4-UNDERLAY-PEERS
-      activate: true
     - name: EVPN-OVERLAY-PEERS
       activate: false
-  neighbors:
-  - ip_address: 10.255.1.100
-    peer_group: MLAG-IPv4-UNDERLAY-PEER
-    description: dc1-leaf2a
-  - ip_address: 10.255.255.12
-    peer_group: IPv4-UNDERLAY-PEERS
-    remote_as: '65100'
-    description: dc1-spine1_Ethernet4
-  - ip_address: 10.255.255.14
-    peer_group: IPv4-UNDERLAY-PEERS
-    remote_as: '65100'
-    description: dc1-spine2_Ethernet4
-  - ip_address: 10.255.0.1
-    peer_group: EVPN-OVERLAY-PEERS
-    description: dc1-spine1
-    remote_as: '65100'
-  - ip_address: 10.255.0.2
-    peer_group: EVPN-OVERLAY-PEERS
-    description: dc1-spine2
-    remote_as: '65100'
-  redistribute_routes:
-  - source_protocol: connected
-    route_map: RM-CONN-2-BGP
+    - name: MLAG-IPv4-UNDERLAY-PEER
+      activate: true
   address_family_evpn:
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
       activate: true
+      route_map_in: RM-EVPN-SOO-IN
+      route_map_out: RM-EVPN-SOO-OUT
   vrfs:
   - name: VRF10
     router_id: 10.255.0.6
@@ -255,6 +227,8 @@ vlan_interfaces:
   shutdown: false
   mtu: 1500
   ip_address: 10.255.1.101/31
+  ospf_network_point_to_point: true
+  ospf_area: 0.0.0.0
 - name: Vlan4094
   description: MLAG_PEER
   shutdown: false
@@ -348,23 +322,27 @@ ethernet_interfaces:
     id: 3
     mode: active
 - name: Ethernet1
-  peer: dc1-spine1
+  peer: dc1-leaf1a
   peer_interface: Ethernet4
-  peer_type: spine
-  description: P2P_LINK_TO_DC1-SPINE1_Ethernet4
+  peer_type: l3leaf
+  description: P2P_LINK_TO_DC1-LEAF1A_Ethernet4
   shutdown: false
   mtu: 1500
   type: routed
   ip_address: 10.255.255.13/31
+  ospf_network_point_to_point: true
+  ospf_area: 0.0.0.0
 - name: Ethernet2
-  peer: dc1-spine2
+  peer: dc1-leaf1b
   peer_interface: Ethernet4
-  peer_type: spine
-  description: P2P_LINK_TO_DC1-SPINE2_Ethernet4
+  peer_type: l3leaf
+  description: P2P_LINK_TO_DC1-LEAF1B_Ethernet4
   shutdown: false
   mtu: 1500
   type: routed
   ip_address: 10.255.255.15/31
+  ospf_network_point_to_point: true
+  ospf_area: 0.0.0.0
 - name: Ethernet8
   peer: dc1-leaf2c
   peer_interface: Ethernet2
@@ -392,29 +370,17 @@ mlag_configuration:
   peer_link: Port-Channel3
   reload_delay_mlag: '300'
   reload_delay_non_mlag: '330'
-route_maps:
-- name: RM-MLAG-PEER-IN
-  sequence_numbers:
-  - sequence: 10
-    type: permit
-    set:
-    - origin incomplete
-    description: Make routes learned over MLAG Peer-link less preferred on spines to ensure optimal routing
-- name: RM-CONN-2-BGP
-  sequence_numbers:
-  - sequence: 10
-    type: permit
-    match:
-    - ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
   shutdown: false
   ip_address: 10.255.0.6/32
+  ospf_area: 0.0.0.0
 - name: Loopback1
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
   ip_address: 10.255.1.5/32
+  ospf_area: 0.0.0.0
 - name: Loopback10
   description: VRF10_VTEP_DIAGNOSTICS
   shutdown: false
@@ -425,18 +391,49 @@ loopback_interfaces:
   shutdown: false
   vrf: VRF11
   ip_address: 10.255.11.6/32
-prefix_lists:
-- name: PL-LOOPBACKS-EVPN-OVERLAY
-  sequence_numbers:
-  - sequence: 10
-    action: permit 10.255.0.0/27 eq 32
-  - sequence: 20
-    action: permit 10.255.1.0/27 eq 32
+router_ospf:
+  process_ids:
+  - id: 100
+    passive_interface_default: true
+    router_id: 10.255.0.6
+    max_lsa: 12000
+    no_passive_interfaces:
+    - Ethernet1
+    - Ethernet2
+    - Vlan4093
+    bfd_enable: false
+ip_extcommunity_lists:
+- name: ECL-EVPN-SOO
+  entries:
+  - type: permit
+    extcommunities: soo 10.255.1.5:1
 router_bfd:
   multihop:
     interval: 300
     min_rx: 300
     multiplier: 3
+route_maps:
+- name: RM-EVPN-SOO-IN
+  sequence_numbers:
+  - sequence: 10
+    type: deny
+    match:
+    - extcommunity ECL-EVPN-SOO
+  - sequence: 20
+    type: permit
+- name: RM-EVPN-SOO-OUT
+  sequence_numbers:
+  - sequence: 10
+    type: permit
+    set:
+    - extcommunity soo 10.255.1.5:1 additive
+- name: RM-MLAG-PEER-IN
+  sequence_numbers:
+  - sequence: 10
+    type: permit
+    set:
+    - origin incomplete
+    description: Make routes learned over MLAG Peer-link less preferred on spines to ensure optimal routing
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:00:99
