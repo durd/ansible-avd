@@ -4,6 +4,7 @@ tenants:
   - name: TENANT1
     # Number used to generate the VNI of each VLAN by adding the VLAN number in this tenant.
     mac_vrf_vni_base: 10000
+    enable_mlag_ibgp_peering_vrfs: false
     vrfs:
       # VRF definitions inside the tenant.
       - name: VRF10

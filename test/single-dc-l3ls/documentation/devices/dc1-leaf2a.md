@@ -219,14 +219,14 @@ STP mode: **mstp**
 
 #### Global Spanning-Tree Settings
 
-- Spanning Tree disabled for VLANs: **4093-4094**
+- Spanning Tree disabled for VLANs: **4094**
 
 ### Spanning Tree Device Configuration
 
 ```eos
 !
 spanning-tree mode mstp
-no spanning-tree vlan-id 4093-4094
+no spanning-tree vlan-id 4094
 spanning-tree mst 0 priority 4096
 ```
 
@@ -255,11 +255,8 @@ vlan internal order ascending range 1006 1199
 | 12 | VRF10_VLAN12 | - |
 | 21 | VRF11_VLAN21 | - |
 | 22 | VRF11_VLAN22 | - |
-| 3009 | MLAG_iBGP_VRF10 | LEAF_PEER_L3 |
-| 3010 | MLAG_iBGP_VRF11 | LEAF_PEER_L3 |
 | 3401 | L2_VLAN3401 | - |
 | 3402 | L2_VLAN3402 | - |
-| 4093 | LEAF_PEER_L3 | LEAF_PEER_L3 |
 | 4094 | MLAG_PEER | MLAG |
 
 ### VLANs Device Configuration
@@ -278,23 +275,11 @@ vlan 21
 vlan 22
    name VRF11_VLAN22
 !
-vlan 3009
-   name MLAG_iBGP_VRF10
-   trunk group LEAF_PEER_L3
-!
-vlan 3010
-   name MLAG_iBGP_VRF11
-   trunk group LEAF_PEER_L3
-!
 vlan 3401
    name L2_VLAN3401
 !
 vlan 3402
    name L2_VLAN3402
-!
-vlan 4093
-   name LEAF_PEER_L3
-   trunk group LEAF_PEER_L3
 !
 vlan 4094
    name MLAG_PEER
@@ -473,9 +458,6 @@ interface Loopback11
 | Vlan12 | VRF10_VLAN12 | VRF10 | - | False |
 | Vlan21 | VRF11_VLAN21 | VRF11 | - | False |
 | Vlan22 | VRF11_VLAN22 | VRF11 | - | False |
-| Vlan3009 | MLAG_PEER_L3_iBGP: vrf VRF10 | VRF10 | 1500 | False |
-| Vlan3010 | MLAG_PEER_L3_iBGP: vrf VRF11 | VRF11 | 1500 | False |
-| Vlan4093 | MLAG_PEER_L3_PEERING | default | 1500 | False |
 | Vlan4094 | MLAG_PEER | default | 1500 | False |
 
 ##### IPv4
@@ -486,9 +468,6 @@ interface Loopback11
 | Vlan12 |  VRF10  |  -  |  10.10.12.1/24  |  -  |  -  |  -  |  -  |
 | Vlan21 |  VRF11  |  -  |  10.10.21.1/24  |  -  |  -  |  -  |  -  |
 | Vlan22 |  VRF11  |  -  |  10.10.22.1/24  |  -  |  -  |  -  |  -  |
-| Vlan3009 |  VRF10  |  10.255.1.100/31  |  -  |  -  |  -  |  -  |  -  |
-| Vlan3010 |  VRF11  |  10.255.1.100/31  |  -  |  -  |  -  |  -  |  -  |
-| Vlan4093 |  default  |  10.255.1.100/31  |  -  |  -  |  -  |  -  |  -  |
 | Vlan4094 |  default  |  10.255.1.68/31  |  -  |  -  |  -  |  -  |  -  |
 
 #### VLAN Interfaces Device Configuration
@@ -519,34 +498,14 @@ interface Vlan22
    vrf VRF11
    ip address virtual 10.10.22.1/24
 !
-interface Vlan3009
-   description MLAG_PEER_L3_iBGP: vrf VRF10
-   no shutdown
-   mtu 1500
-   vrf VRF10
-   ip address 10.255.1.100/31
-!
-interface Vlan3010
-   description MLAG_PEER_L3_iBGP: vrf VRF11
-   no shutdown
-   mtu 1500
-   vrf VRF11
-   ip address 10.255.1.100/31
-!
-interface Vlan4093
-   description MLAG_PEER_L3_PEERING
-   no shutdown
-   mtu 1500
-   ip address 10.255.1.100/31
-   ip ospf network point-to-point
-   ip ospf area 0.0.0.0
-!
 interface Vlan4094
    description MLAG_PEER
    no shutdown
    mtu 1500
    no autostate
    ip address 10.255.1.68/31
+   ip ospf network point-to-point
+   ip ospf area 0.0.0.0
 ```
 
 ### VXLAN Interface
@@ -673,7 +632,7 @@ ip route vrf MGMT 0.0.0.0/0 172.16.1.1
 
 | Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail | Auto Cost Reference Bandwidth | Maximum Paths | MPLS LDP Sync Default | Distribute List In |
 | ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- | ----------------------------- | ------------- | --------------------- | ------------------ |
-| 100 | 10.255.0.5 | enabled | Ethernet1 <br> Ethernet2 <br> Vlan4093 <br> | disabled | 12000 | disabled | disabled | - | - | - | - |
+| 100 | 10.255.0.5 | enabled | Ethernet1 <br> Ethernet2 <br> Vlan4094 <br> | disabled | 12000 | disabled | disabled | - | - | - | - |
 
 #### OSPF Interfaces
 
@@ -681,7 +640,7 @@ ip route vrf MGMT 0.0.0.0/0 172.16.1.1
 | -------- | -------- | -------- | -------- |
 | Ethernet1 | 0.0.0.0 | - | True |
 | Ethernet2 | 0.0.0.0 | - | True |
-| Vlan4093 | 0.0.0.0 | - | True |
+| Vlan4094 | 0.0.0.0 | - | True |
 | Loopback0 | 0.0.0.0 | - | - |
 | Loopback1 | 0.0.0.0 | - | - |
 
@@ -694,7 +653,7 @@ router ospf 100
    passive-interface default
    no passive-interface Ethernet1
    no passive-interface Ethernet2
-   no passive-interface Vlan4093
+   no passive-interface Vlan4094
    max-lsa 12000
 ```
 
@@ -723,23 +682,6 @@ router ospf 100
 | BFD | True |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
-
-##### MLAG-IPv4-UNDERLAY-PEER
-
-| Settings | Value |
-| -------- | ----- |
-| Address Family | ipv4 |
-| Remote AS | 65101 |
-| Next-hop self | True |
-| Send community | all |
-| Maximum routes | 12000 |
-
-#### BGP Neighbors
-
-| Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
-| -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
-| 10.255.1.101 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | VRF10 | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
-| 10.255.1.101 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | VRF11 | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -782,14 +724,6 @@ router bgp 65101
    neighbor EVPN-OVERLAY-PEERS password 7 <removed>
    neighbor EVPN-OVERLAY-PEERS send-community
    neighbor EVPN-OVERLAY-PEERS maximum-routes 0
-   neighbor MLAG-IPv4-UNDERLAY-PEER peer group
-   neighbor MLAG-IPv4-UNDERLAY-PEER remote-as 65101
-   neighbor MLAG-IPv4-UNDERLAY-PEER next-hop-self
-   neighbor MLAG-IPv4-UNDERLAY-PEER description dc1-leaf2b
-   neighbor MLAG-IPv4-UNDERLAY-PEER password 7 <removed>
-   neighbor MLAG-IPv4-UNDERLAY-PEER send-community
-   neighbor MLAG-IPv4-UNDERLAY-PEER maximum-routes 12000
-   neighbor MLAG-IPv4-UNDERLAY-PEER route-map RM-MLAG-PEER-IN in
    !
    vlan 11
       rd 10.255.0.5:10011
@@ -828,14 +762,12 @@ router bgp 65101
    !
    address-family ipv4
       no neighbor EVPN-OVERLAY-PEERS activate
-      neighbor MLAG-IPv4-UNDERLAY-PEER activate
    !
    vrf VRF10
       rd 10.255.0.5:10
       route-target import evpn 10:10
       route-target export evpn 10:10
       router-id 10.255.0.5
-      neighbor 10.255.1.101 peer group MLAG-IPv4-UNDERLAY-PEER
       redistribute connected
    !
    vrf VRF11
@@ -843,7 +775,6 @@ router bgp 65101
       route-target import evpn 11:11
       route-target export evpn 11:11
       router-id 10.255.0.5
-      neighbor 10.255.1.101 peer group MLAG-IPv4-UNDERLAY-PEER
       redistribute connected
 ```
 
@@ -899,12 +830,6 @@ router bfd
 | -------- | ---- | ----- | --- | ------------- | -------- |
 | 10 | permit | - | extcommunity soo 10.255.1.5:1 additive | - | - |
 
-##### RM-MLAG-PEER-IN
-
-| Sequence | Type | Match | Set | Sub-Route-Map | Continue |
-| -------- | ---- | ----- | --- | ------------- | -------- |
-| 10 | permit | - | origin incomplete | - | - |
-
 #### Route-maps Device Configuration
 
 ```eos
@@ -916,10 +841,6 @@ route-map RM-EVPN-SOO-IN permit 20
 !
 route-map RM-EVPN-SOO-OUT permit 10
    set extcommunity soo 10.255.1.5:1 additive
-!
-route-map RM-MLAG-PEER-IN permit 10
-   description Make routes learned over MLAG Peer-link less preferred on spines to ensure optimal routing
-   set origin incomplete
 ```
 
 ### IP Extended Community Lists
