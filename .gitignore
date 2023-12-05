@@ -32,6 +32,8 @@ ansible_collections/arista/avd/tests/.mypy_cache/
 # Development
 ## pyenv
 .python-version
+venv/
+
 ## .vscode/*
 .vscode/launch.json
 */.vscode/*
