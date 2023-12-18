@@ -41,3 +41,4 @@ venv/
 
 # OSX
 *.DS_Store
+test/*
