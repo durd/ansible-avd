@@ -1,4 +1,7 @@
 hostname: dc1-leaf2c
+metadata:
+  platform: vEOS-lab
+is_deployed: true
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0

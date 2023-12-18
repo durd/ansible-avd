@@ -1,4 +1,7 @@
 hostname: dc1-leaf1a
+metadata:
+  platform: 7280R3
+is_deployed: true
 router_bgp:
   as: '65101'
   router_id: 10.255.1.13
@@ -10,6 +13,7 @@ router_bgp:
     ecmp: 4
   updates:
     wait_install: true
+  bgp_cluster_id: 10.255.1.13
   peer_groups:
   - name: EVPN-OVERLAY-PEERS
     type: evpn
@@ -19,6 +23,7 @@ router_bgp:
     send_community: all
     maximum_routes: 0
     remote_as: '65101'
+    route_reflector_client: true
   - name: MLAG-IPv4-UNDERLAY-PEER
     type: ipv4
     remote_as: '65101'
@@ -28,18 +33,27 @@ router_bgp:
     maximum_routes: 12000
     send_community: all
     route_map_in: RM-MLAG-PEER-IN
-  address_family_ipv4:
-    peer_groups:
-    - name: EVPN-OVERLAY-PEERS
-      activate: false
-    - name: MLAG-IPv4-UNDERLAY-PEER
-      activate: true
   address_family_evpn:
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
       activate: true
       route_map_in: RM-EVPN-SOO-IN
       route_map_out: RM-EVPN-SOO-OUT
+  address_family_ipv4:
+    peer_groups:
+    - name: EVPN-OVERLAY-PEERS
+      activate: false
+    - name: MLAG-IPv4-UNDERLAY-PEER
+      activate: true
+  neighbors:
+  - ip_address: 10.255.1.14
+    peer_group: EVPN-OVERLAY-PEERS
+    peer: dc1-leaf1b
+    description: dc1-leaf1b
+  - ip_address: 10.255.2.24
+    peer_group: EVPN-OVERLAY-PEERS
+    peer: dc2-leaf1b
+    description: dc2-leaf1b
   vrfs:
   - name: VRF10
     router_id: 10.255.1.13
@@ -342,18 +356,18 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9216
   type: routed
-  ip_address: 10.255.22.120/31
+  ip_address: 10.255.22.40/31
   ospf_network_point_to_point: true
   ospf_area: 0.0.0.0
 - name: Ethernet45
   peer: dc2-leaf1b
-  peer_interface: Ethernet44
+  peer_interface: Ethernet45
   peer_type: l3leaf
-  description: P2P_LINK_TO_DC2-LEAF1B_Ethernet44
+  description: P2P_LINK_TO_DC2-LEAF1B_Ethernet45
   shutdown: false
   mtu: 9216
   type: routed
-  ip_address: 10.255.22.84/31
+  ip_address: 10.255.22.128/31
   ospf_network_point_to_point: true
   ospf_area: 0.0.0.0
 - name: Ethernet46
@@ -364,7 +378,7 @@ ethernet_interfaces:
   shutdown: false
   mtu: 9216
   type: routed
-  ip_address: 10.255.12.21/31
+  ip_address: 10.255.12.44/31
   ospf_network_point_to_point: true
   ospf_area: 0.0.0.0
 - name: Ethernet5
@@ -382,8 +396,8 @@ mlag_configuration:
   local_interface: Vlan4094
   peer_address: 10.255.13.21
   peer_link: Port-Channel47
-  reload_delay_mlag: '300'
-  reload_delay_non_mlag: '330'
+  reload_delay_mlag: '900'
+  reload_delay_non_mlag: '1020'
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering

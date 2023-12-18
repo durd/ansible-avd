@@ -66,6 +66,29 @@ default_interfaces:
     platforms: [ default ]
     uplink_interfaces: [ Ethernet47-48 ]
 
+# L3 Edge port definitions. This can be any port in the entire Fabric, where IP interfaces are defined.
+# l3_edge:
+#   # Define a new IP pool that will be used to assign IP addresses to L3 Edge interfaces.
+#   p2p_links_ip_pools:
+#     - name: DCI_IP_pool
+#       ipv4_pool: 172.100.100.0/24
+#   # Define a new link profile which will match the IP pool, the used ASNs and include the defined interface into underlay routing
+#   p2p_links_profiles:
+#     - name: DCI_profile
+#       ip_pool: DCI_IP_pool
+#       as: [65101, 65101]
+#       include_in_underlay_protocol: true
+#   # Define each P2P L3 link and link the nodes, the interfaces and the profile used.
+#   p2p_links:
+#     - id: 1
+#       nodes: [dc1-leaf1a, dc2-leaf1a]
+#       interfaces: [Ethernet44, Ethernet44]
+#       profile: DCI_profile
+#     - id: 2
+#       nodes: [dc1-leaf1b, dc2-leaf1b]
+#       interfaces: [Ethernet44, Ethernet44]
+#       profile: DCI_profile
+
 # CloudVision Portal definitions
 cvp_instance_ips:
   - 192.168.1.12
@@ -85,3 +108,40 @@ terminattr_disable_aaa: true
 #   servers:
 #     - name: 0.pool.ntp.org
 #       vrf: MGMT
+# node_type_keys:
+#   - key: spline
+#     type: spline
+#     connected_endpoints: true
+#     default_evpn_role: server
+#     default_ptp_priority1: 20
+#     mlag_support: true
+#     network_services:
+#       l2: true
+#       l3: true
+#     vtep: true
+
+#   - key: l3leaf
+#     type: l3leaf
+#     connected_endpoints: true
+#     default_evpn_role: client
+#     default_ptp_priority1: 30
+#     mlag_support: true
+#     network_services:
+#       l2: true
+#       l3: true
+#     vtep: true
+
+#   - key: l2leaf
+#     type: l2leaf
+#     connected_endpoints: true
+#     mlag_support: true
+#     network_services:
+#       l2: true
+#     underlay_router: false
+#     uplink_type: port-channel
+
+#   - key: super_spine
+#     type: super-spine
+#   - key: overlay_controller
+#     type: overlay-controller
+#     default_evpn_role: server

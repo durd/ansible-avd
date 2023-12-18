@@ -17,11 +17,11 @@
 
 | POD | Type | Node | Management IP | Platform | Provisioned in CloudVision | Serial Number |
 | --- | ---- | ---- | ------------- | -------- | -------------------------- | ------------- |
-| FABRIC | l3leaf | dc1-leaf1a | 172.16.1.101/24 | sand | Provisioned | - |
-| FABRIC | l3leaf | dc1-leaf1b | 172.16.1.102/24 | sand | Provisioned | - |
+| FABRIC | l3leaf | dc1-leaf1a | 172.16.1.101/24 | 7280R3 | Provisioned | - |
+| FABRIC | l3leaf | dc1-leaf1b | 172.16.1.102/24 | 7280R3 | Provisioned | - |
 | FABRIC | l2leaf | dc1-leaf1c | 172.16.1.151/24 | vEOS-lab | Provisioned | - |
-| FABRIC | l3leaf | dc2-leaf1a | 172.16.2.101/24 | sand | Provisioned | - |
-| FABRIC | l3leaf | dc2-leaf1b | 172.16.2.102/24 | sand | Provisioned | - |
+| FABRIC | l3leaf | dc2-leaf1a | 172.16.2.101/24 | 7280R3 | Provisioned | - |
+| FABRIC | l3leaf | dc2-leaf1b | 172.16.2.102/24 | 7280R3 | Provisioned | - |
 | FABRIC | l2leaf | dc2-leaf1c | 172.16.2.151/24 | vEOS-lab | Provisioned | - |
 
 > Provision status is based on Ansible inventory declaration and do not represent real status from CloudVision.
@@ -37,13 +37,13 @@
 | ---- | ---- | -------------- | --------- | ----------| -------------- |
 | l3leaf | dc1-leaf1a | Ethernet43 | l2leaf | dc1-leaf1c | Ethernet47 |
 | l3leaf | dc1-leaf1a | Ethernet44 | l3leaf | dc2-leaf1a | Ethernet44 |
-| l3leaf | dc1-leaf1a | Ethernet45 | l3leaf | dc2-leaf1b | Ethernet44 |
+| l3leaf | dc1-leaf1a | Ethernet45 | l3leaf | dc2-leaf1b | Ethernet45 |
 | l3leaf | dc1-leaf1a | Ethernet46 | l3leaf | dc1-leaf1b | Ethernet46 |
 | l3leaf | dc1-leaf1a | Ethernet47 | mlag_peer | dc1-leaf1b | Ethernet47 |
 | l3leaf | dc1-leaf1a | Ethernet48 | mlag_peer | dc1-leaf1b | Ethernet48 |
 | l3leaf | dc1-leaf1b | Ethernet43 | l2leaf | dc1-leaf1c | Ethernet48 |
-| l3leaf | dc1-leaf1b | Ethernet44 | l3leaf | dc2-leaf1a | Ethernet45 |
-| l3leaf | dc1-leaf1b | Ethernet45 | l3leaf | dc2-leaf1b | Ethernet45 |
+| l3leaf | dc1-leaf1b | Ethernet44 | l3leaf | dc2-leaf1b | Ethernet44 |
+| l3leaf | dc1-leaf1b | Ethernet45 | l3leaf | dc2-leaf1a | Ethernet45 |
 | l3leaf | dc2-leaf1a | Ethernet43 | l2leaf | dc2-leaf1c | Ethernet47 |
 | l3leaf | dc2-leaf1a | Ethernet46 | l3leaf | dc2-leaf1b | Ethernet46 |
 | l3leaf | dc2-leaf1a | Ethernet47 | mlag_peer | dc2-leaf1b | Ethernet47 |
@@ -56,19 +56,19 @@
 
 | Uplink IPv4 Pool | Available Addresses | Assigned addresses | Assigned Address % |
 | ---------------- | ------------------- | ------------------ | ------------------ |
-| 10.255.12.0/24 | 256 | 2 | 0.79 % |
-| 10.255.22.0/24 | 256 | 10 | 3.91 % |
+| 10.255.12.0/24 | 256 | 4 | 1.57 % |
+| 10.255.22.0/24 | 256 | 8 | 3.13 % |
 
 ### Point-To-Point Links Node Allocation
 
 | Node | Node Interface | Node IP Address | Peer Node | Peer Interface | Peer IP Address |
 | ---- | -------------- | --------------- | --------- | -------------- | --------------- |
-| dc1-leaf1a | Ethernet44 | 10.255.22.120/31 | dc2-leaf1a | Ethernet44 | 10.255.22.121/31 |
-| dc1-leaf1a | Ethernet45 | 10.255.22.84/31 | dc2-leaf1b | Ethernet44 | 10.255.22.85/31 |
-| dc1-leaf1a | Ethernet46 | 10.255.12.21/31 | dc1-leaf1b | Ethernet46 | 10.255.12.20/31 |
-| dc1-leaf1b | Ethernet44 | 10.255.22.122/31 | dc2-leaf1a | Ethernet45 | 10.255.22.123/31 |
-| dc1-leaf1b | Ethernet45 | 10.255.22.86/31 | dc2-leaf1b | Ethernet45 | 10.255.22.87/31 |
-| dc2-leaf1a | Ethernet46 | 10.255.22.125/31 | dc2-leaf1b | Ethernet46 | 10.255.22.124/31 |
+| dc1-leaf1a | Ethernet44 | 10.255.22.40/31 | dc2-leaf1a | Ethernet44 | 10.255.22.41/31 |
+| dc1-leaf1a | Ethernet45 | 10.255.22.128/31 | dc2-leaf1b | Ethernet45 | 10.255.22.129/31 |
+| dc1-leaf1a | Ethernet46 | 10.255.12.44/31 | dc1-leaf1b | Ethernet46 | 10.255.12.45/31 |
+| dc1-leaf1b | Ethernet44 | 10.255.22.130/31 | dc2-leaf1b | Ethernet44 | 10.255.22.131/31 |
+| dc1-leaf1b | Ethernet45 | 10.255.12.47/31 | dc2-leaf1a | Ethernet45 | 10.255.12.46/31 |
+| dc2-leaf1a | Ethernet46 | 10.255.22.126/31 | dc2-leaf1b | Ethernet46 | 10.255.22.127/31 |
 
 ### Loopback Interfaces (BGP EVPN Peering)
 

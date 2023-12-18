@@ -17,7 +17,7 @@
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
   - [Internal VLAN Allocation Policy Summary](#internal-vlan-allocation-policy-summary)
-  - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
+  - [Internal VLAN Allocation Policy Device Configuration](#internal-vlan-allocation-policy-device-configuration)
 - [VLANs](#vlans)
   - [VLANs Summary](#vlans-summary)
   - [VLANs Device Configuration](#vlans-device-configuration)
@@ -89,7 +89,7 @@ interface Management1
 | -------- | -------- | -------- |
 | MGMT | - | - |
 
-#### Management API HTTP Configuration
+#### Management API HTTP Device Configuration
 
 ```eos
 !
@@ -158,8 +158,8 @@ mlag configuration
    local-interface Vlan4094
    peer-address 10.255.23.40
    peer-link Port-Channel47
-   reload-delay mlag 300
-   reload-delay non-mlag 330
+   reload-delay mlag 900
+   reload-delay non-mlag 1020
 ```
 
 ## Spanning Tree
@@ -195,7 +195,7 @@ spanning-tree mst 0 priority 4096
 | ------------------| --------------- | ------------ |
 | ascending | 1006 | 1199 |
 
-### Internal VLAN Allocation Policy Configuration
+### Internal VLAN Allocation Policy Device Configuration
 
 ```eos
 !
@@ -278,9 +278,9 @@ vlan 4094
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet44 | P2P_LINK_TO_DC1-LEAF1A_Ethernet45 | routed | - | 10.255.22.85/31 | default | 9216 | False | - | - |
-| Ethernet45 | P2P_LINK_TO_DC1-LEAF1B_Ethernet45 | routed | - | 10.255.22.87/31 | default | 9216 | False | - | - |
-| Ethernet46 | P2P_LINK_TO_DC2-LEAF1A_Ethernet46 | routed | - | 10.255.22.124/31 | default | 9216 | False | - | - |
+| Ethernet44 | P2P_LINK_TO_DC1-LEAF1B_Ethernet44 | routed | - | 10.255.22.131/31 | default | 9216 | False | - | - |
+| Ethernet45 | P2P_LINK_TO_DC1-LEAF1A_Ethernet45 | routed | - | 10.255.22.129/31 | default | 9216 | False | - | - |
+| Ethernet46 | P2P_LINK_TO_DC2-LEAF1A_Ethernet46 | routed | - | 10.255.22.127/31 | default | 9216 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -292,20 +292,20 @@ interface Ethernet43
    channel-group 43 mode active
 !
 interface Ethernet44
-   description P2P_LINK_TO_DC1-LEAF1A_Ethernet45
+   description P2P_LINK_TO_DC1-LEAF1B_Ethernet44
    no shutdown
    mtu 9216
    no switchport
-   ip address 10.255.22.85/31
+   ip address 10.255.22.131/31
    ip ospf network point-to-point
    ip ospf area 0.0.0.0
 !
 interface Ethernet45
-   description P2P_LINK_TO_DC1-LEAF1B_Ethernet45
+   description P2P_LINK_TO_DC1-LEAF1A_Ethernet45
    no shutdown
    mtu 9216
    no switchport
-   ip address 10.255.22.87/31
+   ip address 10.255.22.129/31
    ip ospf network point-to-point
    ip ospf area 0.0.0.0
 !
@@ -314,7 +314,7 @@ interface Ethernet46
    no shutdown
    mtu 9216
    no switchport
-   ip address 10.255.22.124/31
+   ip address 10.255.22.127/31
    ip ospf network point-to-point
    ip ospf area 0.0.0.0
 !
@@ -378,7 +378,6 @@ interface Port-Channel47
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
-
 
 #### Loopback Interfaces Device Configuration
 
@@ -545,9 +544,9 @@ service routing protocols model multi-agent
 
 #### Virtual Router MAC Address Summary
 
-##### Virtual Router MAC Address: 00:1c:73:00:00:99
+Virtual Router MAC Address: 00:1c:73:00:00:99
 
-#### Virtual Router MAC Address Configuration
+#### Virtual Router MAC Address Device Configuration
 
 ```eos
 !
@@ -590,8 +589,8 @@ ip routing vrf VRF11
 
 #### Static Routes Summary
 
-| VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
-| --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
+| VRF | Destination Prefix | Next Hop IP | Exit interface | Administrative Distance | Tag | Route Name | Metric |
+| --- | ------------------ | ----------- | -------------- | ----------------------- | --- | ---------- | ------ |
 | MGMT | 0.0.0.0/0 | 172.16.1.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
@@ -675,6 +674,8 @@ router ospf 100
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
+| 10.255.1.13 | Inherited from peer group EVPN-OVERLAY-PEERS | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 10.255.2.23 | Inherited from peer group EVPN-OVERLAY-PEERS | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.24.40 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | VRF10 | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
 | 10.255.24.40 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | VRF11 | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
 
@@ -728,6 +729,10 @@ router bgp 65101
    neighbor MLAG-IPv4-UNDERLAY-PEER send-community
    neighbor MLAG-IPv4-UNDERLAY-PEER maximum-routes 12000
    neighbor MLAG-IPv4-UNDERLAY-PEER route-map RM-MLAG-PEER-IN in
+   neighbor 10.255.1.13 peer group EVPN-OVERLAY-PEERS
+   neighbor 10.255.1.13 description dc1-leaf1a
+   neighbor 10.255.2.23 peer group EVPN-OVERLAY-PEERS
+   neighbor 10.255.2.23 description dc2-leaf1a
    !
    vlan 11
       rd 10.255.2.24:10011
@@ -870,7 +875,7 @@ route-map RM-MLAG-PEER-IN permit 10
 | --------- | ---- | -------------------- |
 | ECL-EVPN-SOO | permit | soo 10.255.21.23:1 |
 
-#### IP Extended Community Lists configuration
+#### IP Extended Community Lists Device Configuration
 
 ```eos
 !

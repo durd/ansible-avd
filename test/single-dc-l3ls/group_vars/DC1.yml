@@ -3,29 +3,29 @@
 mgmt_gateway: 172.16.1.1
 
 # Spine switch group
-# spine:
-#   # Definition of default values that will be configured to all nodes defined in this group
-#   defaults:
-#     # Set the relevant platform as each platform has different default values in Ansible AVD
-#     platform: vEOS-lab
-#     # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
-#     loopback_ipv4_pool: 10.255.0.0/27
-#     # ASN to be used by BGP
-#     bgp_as: 65100
+spine:
+  # Definition of default values that will be configured to all nodes defined in this group
+  defaults:
+    # Set the relevant platform as each platform has different default values in Ansible AVD
+    platform: vEOS-lab
+    # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
+    loopback_ipv4_pool: 10.255.0.0/27
+    # ASN to be used by BGP
+    bgp_as: 65100
 
-#   # Definition of nodes contained in this group.
-#   # Specific configuration of device must take place under the node definition. Each node inherits all values defined under 'defaults'
-#   nodes:
-#     # Name of the node to be defined (must be consistent with definition in inventory)
-#     - name: dc1-spine1
-#       # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
-#       id: 1
-#       # Management IP to be assigned to the management interface
-#       mgmt_ip: 172.16.1.11/24
+  # Definition of nodes contained in this group.
+  # Specific configuration of device must take place under the node definition. Each node inherits all values defined under 'defaults'
+  nodes:
+    # Name of the node to be defined (must be consistent with definition in inventory)
+    - name: dc1-spine1
+      # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
+      id: 1
+      # Management IP to be assigned to the management interface
+      mgmt_ip: 172.16.1.11/24
 
-#     - name: dc1-spine2
-#       id: 2
-#       mgmt_ip: 172.16.1.12/24
+    - name: dc1-spine2
+      id: 2
+      mgmt_ip: 172.16.1.12/24
 
 # L3 Leaf switch group
 l3leaf:
@@ -41,7 +41,7 @@ l3leaf:
     # Definition of pool of IPs to be used as Virtual Tunnel EndPoint (VXLAN origin and destination IPs)
     vtep_loopback_ipv4_pool: 10.255.1.0/27
     # Ansible hostname of the devices used to establish neighborship (IP assignments and BGP peering)
-    # uplink_switches: ['dc1-spine1', 'dc1-spine2']
+    uplink_switches: ['dc1-spine1', 'dc1-spine2']
     # Definition of pool of IPs to be used in P2P links
     uplink_ipv4_pool: 10.255.255.0/26
     # Definition of pool of IPs to be used for MLAG peer-link connectivity
@@ -52,7 +52,6 @@ l3leaf:
     virtual_router_mac_address: 00:1c:73:00:00:99
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
-    mlag_peer_l3_vlan: 0
 
   # If two nodes (and only two) are in the same node_group, they will automatically form an MLAG pair
   node_groups:
@@ -60,7 +59,7 @@ l3leaf:
     # Definitions under the group will be inherited by both nodes in the group
     - group: DC1_L3_LEAF1
       # ASN to be used by BGP for the group. Both devices in the MLAG pair will use the same BGP ASN
-      # bgp_as: 65101
+      bgp_as: 65101
       nodes:
         # Definition of hostnames under the node_group
         - name: dc1-leaf1a
@@ -68,21 +67,18 @@ l3leaf:
           mgmt_ip: 172.16.1.101/24
           # Definition of the port to be used in the uplink device facing this device.
           # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
-          # uplink_switch_interfaces:
-          #   - Ethernet1
-          #   - Ethernet1
+          uplink_switch_interfaces:
+            - Ethernet1
+            - Ethernet1
         - name: dc1-leaf1b
           id: 2
           mgmt_ip: 172.16.1.102/24
-          # uplink_switch_interfaces:
-          #   - Ethernet2
-          #   - Ethernet2
+          uplink_switch_interfaces:
+            - Ethernet2
+            - Ethernet2
 
     - group: DC1_L3_LEAF2
-      # bgp_as: 65102
-      uplink_switches:
-        - dc1-leaf1a
-        - dc1-leaf1b
+      bgp_as: 65102
       nodes:
         - name: dc1-leaf2a
           id: 3

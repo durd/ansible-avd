@@ -31,7 +31,7 @@ mgmt_gateway: 172.16.1.1
 l3leaf:
   defaults:
   #   # Set the relevant platform as each platform has different default values in Ansible AVD
-    platform: sand
+    platform: 7280R3
   #   # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
     loopback_ipv4_pool: 10.255.2.0/27
   #   # Offset all assigned loopback IP addresses.
@@ -60,30 +60,54 @@ l3leaf:
     - group: DC2_L3_LEAF1
       # ASN to be used by BGP for the group. Both devices in the MLAG pair will use the same BGP ASN
       # bgp_as: 65101
+      # evpn_gateway:
+      #   evpn_l2:
+      #     enabled: true
+      #   evpn_l3:
+      #     enabled: true
+      #     inter_domain: true
       nodes:
         # Definition of hostnames under the node_group
         - name: dc2-leaf1a
+          evpn_role: server
           id: 21
           mgmt_ip: 172.16.2.101/24
           # Definition of the port to be used in the uplink device facing this device.
           # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
+          uplink_interfaces:
+            - Ethernet44
           uplink_switch_interfaces:
             - Ethernet44
-            - Ethernet44
-            - Ethernet46
           uplink_switches:
             - dc1-leaf1a
-            - dc1-leaf1b
-            - dc2-leaf1b
+          # evpn_gateway:
+          #   # Define remote peers of the EVPN VXLAN Gateway. If the hostname can be found in the inventory, ip_address and BGP ASN will be automatically populated. Manual override takes precedence. If the peer's hostname can not be found in the inventory, ip_address and bgp_as must be defined.
+          #   remote_peers:
+          #     - hostname: dc1-leaf1a
+          #     - hostname: dc1-leaf1b
+          #     - hostname: dc2-leaf1b
         - name: dc2-leaf1b
+          evpn_role: client
           id: 22
           mgmt_ip: 172.16.2.102/24
+          uplink_interfaces:
+            - Ethernet46
+            - Ethernet45
+            - Ethernet44
           uplink_switch_interfaces:
+            - Ethernet46
             - Ethernet45
-            - Ethernet45
+            - Ethernet44
           uplink_switches:
+            - dc2-leaf1a
             - dc1-leaf1a
             - dc1-leaf1b
+          # evpn_gateway:
+          #   # Define remote peers of the EVPN VXLAN Gateway. If the hostname can be found in the inventory, ip_address and BGP ASN will be automatically populated. Manual override takes precedence. If the peer's hostname can not be found in the inventory, ip_address and bgp_as must be defined.
+          #   remote_peers:
+          #     - hostname: dc1-leaf1a
+          #     - hostname: dc1-leaf1b
+          #     - hostname: dc2-leaf1a
 
 
 # L2 Leaf switch group
